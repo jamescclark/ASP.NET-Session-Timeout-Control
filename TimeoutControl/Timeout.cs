@@ -37,6 +37,15 @@ namespace AjaxControls
             set { ViewState["TimeoutUrl"] = value; }
         }
 
+        [Category("Behavior")]
+        [UrlProperty]
+        [Description("URL of Icon to use with Notification API")]
+        public string NotificationIcon
+        {
+            get { return ViewState["NotificationIcon"] as string ?? String.Empty; }
+            set { ViewState["NotificationIcon"] = value; }
+        }
+
         [Description("Span Id to display countdown timer in.")]
         [Category("Behavior")]
         public string CountDownSpanId
@@ -128,6 +137,7 @@ namespace AjaxControls
                 descriptor.AddProperty("countDownSpanId", this.CountDownSpanId);
                 descriptor.AddProperty("clientId", this.ClientID);
                 descriptor.AddProperty("sessionRefreshURL", Page.ResolveClientUrl(this.SessionRefreshUrl));
+                descriptor.AddProperty("notificationIcon", Page.ResolveClientUrl(this.NotificationIcon));
                 return new ScriptDescriptor[] { descriptor };
             }
             else

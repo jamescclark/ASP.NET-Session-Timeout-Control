@@ -6,6 +6,9 @@ AjaxControls.Timeout = function (element) {
 
     // self reference
     var myself = this;
+    // notification object
+    var note = null;
+    var notificationIcon = null;
     // countdown
     var countDownSeconds = null;
     var countDownDelegate = null;
@@ -67,12 +70,37 @@ AjaxControls.Timeout = function (element) {
         myself.show();
         // focus the window
         window.focus();
+
+        //create and open notification 
+        if(window.Notification)
+        showNotification();
+    }
+
+    function showNotification() {
+        var args = {
+            body: "Click here to continue your session.",
+            icon:null
+        };
+        if (this.notificationIcon == "") {
+            args.icon = null;
+        }
+        note = new Notification("Your session is about to expire.", args);
+        note.onclick = function (e) {
+            myself.reset();
+            
+        };
     }
 
     // MS AJAX required function
     this.initialize = function() {
 
         AjaxControls.Timeout.callBaseMethod(this, 'initialize');
+
+        //if Notification api exists, ask for permission if not already granted
+        if (window.Notification) {
+            if(Notification.permission == "default")
+                Notification.requestPermission();
+        }
 
         // ensure requirements are met
         if (typeof jQuery == 'undefined')
@@ -166,14 +194,32 @@ AjaxControls.Timeout = function (element) {
         }
     }
 
+    this.get_notificationIcon = function () {
+        return notificationIcon;
+    }
+
+    this.set_notificationIcon = function (value) {
+        if (notificationIcon !== value) {
+            notificationIcon = value;
+            this.raisePropertyChanged("notificationIcon");
+        }
+    }
+
     // use externally to reset timeout - use $find('whateverid').reset()
     this.reset = function () {
         // make sure notification is not visible
         this.hide();
+        myself.closeNotification();
         // reset session
         CallServer();
         // reset timers
         resetTimers();
+    }
+
+    //checks for and closes Notification
+    this.closeNotification = function(){
+        if("close" in myself.note)
+            myself.note.close();
     }
 }
 
@@ -217,6 +263,7 @@ AjaxControls.Timeout.prototype =
     // override if needing to do more than just redirect
     timeout: function () {
         // redirect to the specified timeout url
+        myself.closeNotification();
         window.location = this.get_timeoutUrl();
     }
 }
