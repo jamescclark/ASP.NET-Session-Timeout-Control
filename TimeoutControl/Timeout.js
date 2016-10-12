@@ -77,18 +77,20 @@ AjaxControls.Timeout = function (element) {
     }
 
     function showNotification() {
-        var args = {
-            body: "Click here to continue your session.",
-            icon:null
-        };
-        if (this.notificationIcon == "") {
-            args.icon = null;
+        if (Notification.permission == 'granted') {
+            var args = {
+                body: "Click here to continue your session.",
+                icon: null
+            };
+            if (this.notificationIcon == "") {
+                args.icon = null;
+            }
+            note = new Notification("Your session is about to expire.", args);
+            note.onclick = function (e) {
+                myself.reset();
+
+            };
         }
-        note = new Notification("Your session is about to expire.", args);
-        note.onclick = function (e) {
-            myself.reset();
-            
-        };
     }
 
     // MS AJAX required function
